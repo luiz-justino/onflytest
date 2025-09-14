@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    ports:
+      - "8000:9000"
+    volumes:
+      - .:/var/www
+    networks:
+      - laravel-network
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - CACHE_DRIVER=file
+      - SESSION_DRIVER=file
+    command: php-fpm
+
+networks:
+  laravel-network:
+    driver: bridge
+
