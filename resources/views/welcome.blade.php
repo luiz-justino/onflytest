@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel 12 com Docker</title>
+        <title>Onfly test</title>
 
         <style>
             body {
@@ -71,7 +71,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>🚀 Laravel 12</h1>
+            <h1>🚀 Onfly test</h1>
             <div class="subtitle">Funcionando com Docker!</div>
             
             <div class="status">✅ Aplicação rodando com sucesso</div>
@@ -91,12 +91,12 @@
                 <ul>
                     <li><strong>Aplicação:</strong> http://localhost:8000</li>
                     <li><strong>PhpMyAdmin:</strong> http://localhost:8080</li>
-                    <li><strong>Redis:</strong> localhost:6379</li>
+                    <li><strong>Mailtip:</strong> http://localhost:8025/</li>
                 </ul>
             </div>
             
             <p style="color: #718096; margin-top: 2rem;">
-                Projeto configurado com Docker, Nginx, MySQL e Redis
+                Projeto configurado com Docker, Nginx, MySQL, PHP 8.3, Mailtip e Laravel 12.
             </p>
         </div>
     </body>

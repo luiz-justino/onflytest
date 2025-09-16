@@ -21,9 +21,6 @@ services:
       - APP_DEBUG=true
       - CACHE_DRIVER=file
       - SESSION_DRIVER=file
-    # depends_on:
-    #   - db
-    #   - redis
 
   nginx:
     image: nginx:alpine
@@ -58,18 +55,6 @@ services:
       - laravel-network
     command: --default-authentication-plugin=mysql_native_password
 
-  redis:
-    image: redis:alpine
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    networks:
-      - laravel-network
-    command: redis-server --appendonly yes
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
@@ -85,9 +70,18 @@ services:
     depends_on:
       - db
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - laravel-network      
+
 volumes:
   dbdata:
-  redisdata:
 
 networks:
   laravel-network:

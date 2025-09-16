@@ -1,79 +1,131 @@
-# Laravel 12 com Docker
+# 🚗 Microsserviço de Pedidos de Viagem Corporativa
 
-Este projeto está configurado para rodar Laravel 12 com Docker.
+Este é um microsserviço desenvolvido em **Laravel 12** para gerenciar pedidos de viagem corporativa. O sistema expõe uma API REST completa com autenticação JWT, permitindo que usuários criem, consultem e gerenciem seus pedidos de viagem.
 
-## 🚀 Início Rápido
+---
 
-### Para Desenvolvimento (Recomendado)
+## 🚀 Funcionalidades
+
+### ✅ Implementadas
+- **Autenticação JWT**: Sistema completo de login/registro com tokens
+- **CRUD de Pedidos**: Criar, consultar, atualizar e cancelar pedidos de viagem
+- **Controle de Status**: Aprovação e cancelamento de pedidos
+- **Filtros Avançados**: Por status, destino, período e datas
+- **Notificações**: Email automático para aprovação/cancelamento (via Mailpit)
+- **Validação Completa**: Validação de dados e tratamento de erros
+- **Testes Automatizados**: Cobertura completa com PHPUnit
+- **Docker**: Ambiente containerizado para desenvolvimento
+- **Segurança**: Usuários só podem ver/editar seus próprios pedidos
+
+---
+
+## 🚦 Início Rápido
+
+### 🐳 Subindo o Projeto
+
 ```bash
-# Execute o script de desenvolvimento
-./dev.sh
+git clone SEU_REPOSITORIO.git
+cd onflytest
+docker-compose up -d
+./setup.sh
 ```
 
-### Versão Simples (Para teste rápido)
-```bash
-# Execute o script simples
-./start-simple.sh
-```
-
-### Versão Completa (com Nginx, MySQL, Redis)
-```bash
-# Execute o script completo
-./setup-laravel.sh
-```
+---
 
 ## 🌐 Acesso
 
-- **Aplicação:** http://localhost:8000
-- **PhpMyAdmin:** http://localhost:8080 (apenas versão completa)
-- **Redis:** localhost:6379 (apenas versão completa)
+- **Aplicação:** [http://localhost:8000](http://localhost:8000)
+- **API Base:** [http://localhost:8000/api](http://localhost:8000/api)
+- **PhpMyAdmin:** [http://localhost:8080](http://localhost:8080)
+- **Mailpit (visualização de e-mails):** [http://localhost:8025](http://localhost:8025)
+
+---
+
+## 📚 Documentação da API
+
+### 🔑 Autenticação
+- `POST /api/register` - Registrar novo usuário
+- `POST /api/login` - Login de usuário
+- `POST /api/logout` - Logout
+- `GET /api/me` - Perfil do usuário autenticado
+
+### ✈️ Pedidos de Viagem
+- `GET /api/travel-orders` - Listar pedidos do usuário
+- `POST /api/travel-orders` - Criar novo pedido
+- `GET /api/travel-orders/{id}` - Ver pedido específico
+- `POST /api/travel-orders/{id}/cancel` - Cancelar pedido
+
+### 🛡️ Admin (Aprovação/Cancelamento)
+- `GET /api/admin/travel-orders` - Listar todos os pedidos
+- `PATCH /api/admin/travel-orders/{id}/status` - Atualizar status
+
+---
+
+### 💡 Exemplos de Uso
+
+#### Registrar usuário:
+```bash
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@empresa.com",
+    "password": "senha123",
+    "password_confirmation": "senha123"
+  }'
+```
+
+#### Login:
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "joao@empresa.com",
+    "password": "senha123"
+  }'
+```
+
+#### Criar pedido de viagem:
+```bash
+curl -X POST http://localhost:8000/api/travel-orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+  -d '{
+    "requester_name": "João Silva",
+    "destination": "São Paulo",
+    "departure_date": "2024-12-15",
+    "return_date": "2024-12-20"
+  }'
+```
+
+---
 
 ## 📋 Comandos Úteis
 
-### Gerenciamento de Containers
+### 🐳 Gerenciamento de Containers
 ```bash
-# Desenvolvimento (recomendado)
-docker compose -f docker-compose.dev.yml up -d
-docker compose -f docker-compose.dev.yml down
-docker compose -f docker-compose.dev.yml logs -f
-
-# Versão simples
-docker compose -f docker-compose-simple.yml up -d
-docker compose -f docker-compose-simple.yml down
-docker compose -f docker-compose-simple.yml logs -f
-
-# Versão completa
-docker compose up -d
-docker compose down
-docker compose logs -f
+docker-compose up -d
+docker-compose down
+docker-compose logs -f
 ```
 
-### Comandos Artisan
+### ⚙️ Comandos Artisan
 ```bash
-# Desenvolvimento (recomendado)
-docker compose -f docker-compose.dev.yml exec app php artisan [comando]
-
-# Versão simples
-docker compose -f docker-compose-simple.yml exec app php artisan [comando]
-
-# Versão completa
-docker compose exec app php artisan [comando]
+docker-compose exec app php artisan [comando]
 
 # Exemplos:
-docker compose -f docker-compose.dev.yml exec app php artisan --version
-docker compose -f docker-compose.dev.yml exec app php artisan route:list
-docker compose -f docker-compose.dev.yml exec app php artisan make:model User
-docker compose -f docker-compose.dev.yml exec app php artisan make:controller UserController
+docker-compose exec app php artisan --version
+docker-compose exec app php artisan route:list
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan db:seed --class=AdminUserSeeder
 ```
 
-### Acesso ao Container
+### 🖥️ Acesso ao Container
 ```bash
-# Versão simples
-docker compose -f docker-compose-simple.yml exec app bash
-
-# Versão completa
-docker compose exec app bash
+docker-compose exec app bash
 ```
+
+---
 
 ## 🗂️ Estrutura do Projeto
 
@@ -83,91 +135,159 @@ docker compose exec app bash
 │   │   └── default.conf
 │   └── mysql/
 │       └── my.cnf
-├── docker-compose.yml (versão completa)
-├── docker-compose-simple.yml (versão simples)
+├── docker-compose.yml
 ├── dockerfile
-├── start-simple.sh
-├── setup-laravel.sh
-└── env.example
+├── setup.sh
+├── .env.example
+└── README.md
 ```
 
-## ⚙️ Configurações
+---
 
-### Versão Simples
-- **PHP 8.3** com FPM
-- **Cache/Sessão:** Arquivo
-- **Porta:** 8000
+## ⚙️ Configurações de Ambiente
 
-### Versão Completa
-- **PHP 8.3** com FPM
-- **Nginx** como servidor web
-- **MySQL 8.0** como banco de dados
-- **Redis** para cache e sessões
-- **PhpMyAdmin** para gerenciamento do banco
+### 📄 Variáveis de Ambiente (.env/.env.example)
+
+As principais variáveis já estão configuradas no `.env.example`:
+
+```
+APP_NAME=OnflyTest
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=laravel
+DB_PASSWORD=secret
+
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS=admin@onflytest.com
+MAIL_FROM_NAME="OnflyTest"
+
+JWT_SECRET=
+JWT_TTL=60
+```
+
+> **Obs:** O arquivo `.env` é criado automaticamente a partir do `.env.example` pelo `setup.sh`.
+
+---
+
+## 📧 Serviço de E-mail (Mailpit)
+
+- O projeto utiliza o [Mailpit](https://github.com/axllent/mailpit) para capturar e visualizar e-mails enviados em desenvolvimento.
+- **Acesse a interface web do Mailpit:**  
+  [http://localhost:8025](http://localhost:8025)
+- Porta SMTP utilizada pelo Laravel: `1025`
+
+---
+
+## 🔐 JWT_SECRET
+
+O segredo JWT (`JWT_SECRET`) é utilizado para assinar e validar os tokens de autenticação da API.  
+**Durante o setup, o comando abaixo é executado automaticamente:**
+
+```bash
+docker-compose exec app php artisan jwt:secret --force
+```
+
+Isso garante que o `.env` já estará configurado corretamente para autenticação JWT.
+
+---
+
+## 👤 Seeder de Usuário Administrador
+
+Para criar um usuário administrador padrão, execute:
+
+```bash
+docker-compose exec app php artisan db:seed --class=AdminUserSeeder
+```
+
+- **Email:** admin@onflytest.com
+- **Senha:** admin123
+
+---
+
+## 🔔 Notificações
+
+O sistema utiliza notificações do Laravel. Certifique-se de rodar:
+
+```bash
+docker-compose exec app php artisan notifications:table
+docker-compose exec app php artisan migrate
+```
+
+---
+
+## 🛡️ Permissões de Alteração de Status
+
+- Apenas usuários administradores (`is_admin = 1`) ou o próprio dono do pedido podem alterar o status do travel order.
+- Caso contrário, a API retorna erro 403 (proibido).
+
+---
+
+## 🧪 Executar Testes
+
+```bash
+docker-compose exec app php artisan test
+docker-compose exec app php artisan test --filter=TravelOrderTest
+```
+
+---
 
 ## 🔧 Solução de Problemas
 
-### Problemas de Conectividade
-Se você tiver problemas para baixar imagens Docker, use a versão simples:
-```bash
-./start-simple.sh
-```
-
 ### Erro "No application encryption key has been specified"
-Execute o script de correção:
 ```bash
-./fix-laravel.sh
+docker-compose exec app php artisan key:generate
 ```
 
 ### Erro de Permissão
 ```bash
-# Ajustar permissões
-docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
 
 ### Limpar Cache
 ```bash
-docker compose exec app php artisan config:clear
-docker compose exec app php artisan cache:clear
-docker compose exec app php artisan route:clear
+docker-compose exec app php artisan config:clear
+docker-compose exec app php artisan cache:clear
+docker-compose exec app php artisan route:clear
 ```
+
+---
 
 ## 📦 Publicar no GitHub
 
-### Primeiro commit
 ```bash
-# Inicializar repositório Git
 git init
-
-# Adicionar todos os arquivos
 git add .
-
-# Fazer commit inicial
 git commit -m "Initial commit: Laravel 12 with Docker setup"
-
-# Adicionar repositório remoto (substitua pela sua URL)
 git remote add origin https://github.com/seu-usuario/seu-repositorio.git
-
-# Enviar para GitHub
 git branch -M main
 git push -u origin main
 ```
 
-### Desenvolvimento contínuo
-```bash
-# Para desenvolvimento diário, use:
-./dev.sh
-
-# Para fazer commits:
-git add .
-git commit -m "Descrição das alterações"
-git push
-```
+---
 
 ## 📝 Notas
 
-- O projeto usa PHP 8.3 com todas as extensões necessárias
-- Configuração otimizada para Laravel 12
-- Scripts automatizados para facilitar o uso
-- Três versões: desenvolvimento, simples (apenas PHP) e completa (com todos os serviços)
-- Ambiente de desenvolvimento isolado com volumes persistentes
+- **Laravel 12** com PHP 8.3
+- **Docker** para ambiente isolado
+- **MySQL** como banco de dados principal
+- **Mailpit** para e-mails de desenvolvimento
+- **JWT** para autenticação stateless
+- **PHPUnit** para testes automatizados
+- **Notificações** por email para eventos importantes
+
+---

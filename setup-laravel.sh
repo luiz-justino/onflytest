@@ -1,77 +1,37 @@
 #!/bin/bash
 
-# Script para criar projeto Laravel 12 usando Docker
-# Execute: chmod +x setup-laravel.sh && ./setup-laravel.sh
+echo "⏳ Aguardando containers subirem..."
+sleep 10
 
-echo "🚀 Criando projeto Laravel 12 com Docker..."
+echo "📦 Instalando dependências do Composer..."
+docker-compose exec app composer install
 
-# Verificar se Docker está rodando
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker não está rodando. Inicie o Docker primeiro."
-    exit 1
-fi
+echo "📝 Copiando .env.example para .env (se necessário)..."
+docker-compose exec app cp -n .env.example .env
 
-# Parar containers existentes
-echo "🛑 Parando containers existentes..."
-docker compose down 2>/dev/null || docker-compose down 2>/dev/null
+echo "🔑 Gerando key do Laravel..."
+docker-compose exec app php artisan key:generate
 
-# Construir apenas o container da aplicação primeiro
-echo "🔨 Construindo container da aplicação..."
-docker compose build app
+echo "🔐 Gerando JWT_SECRET..."
+docker-compose exec app php artisan jwt:secret --force
 
-# Criar projeto Laravel usando o container Docker
-echo "📦 Criando projeto Laravel..."
-docker run --rm -v $(pwd):/var/www composer create-project laravel/laravel . --prefer-dist
+echo "🗄️ Rodando migrations e seeders..."
+docker-compose exec app php artisan migrate --seed
 
-# Verificar se o projeto foi criado
-if [ ! -f "composer.json" ]; then
-    echo "❌ Erro ao criar projeto Laravel"
-    exit 1
-fi
+echo "🔔 Gerando tabela de notificações..."
+docker-compose exec app php artisan notifications:table
+docker-compose exec app php artisan migrate
 
-echo "✅ Projeto Laravel criado com sucesso!"
+echo "🧹 Limpando cache de configuração..."
+docker-compose exec app php artisan config:cache
 
-# Copiar arquivo de ambiente
-echo "📝 Configurando arquivo .env..."
-if [ ! -f .env ]; then
-    cp .env.example .env
-fi
-
-# Construir e iniciar todos os containers
-echo "🔨 Iniciando todos os containers..."
-docker compose up -d --build
-
-# Aguardar os containers estarem prontos
-echo "⏳ Aguardando containers estarem prontos..."
-sleep 30
-
-# Gerar chave da aplicação
-echo "🔑 Gerando chave da aplicação..."
-docker compose exec app php artisan key:generate
-
-# Executar migrações
-echo "🗃️ Executando migrações..."
-docker compose exec app php artisan migrate
-
-# Limpar cache
-echo "🧹 Limpando cache..."
-docker compose exec app php artisan config:clear
-docker compose exec app php artisan cache:clear
-docker compose exec app php artisan route:clear
-
-# Criar link simbólico para storage
-echo "🔗 Criando link simbólico para storage..."
-docker compose exec app php artisan storage:link
-
-echo "✅ Setup concluído!"
 echo ""
-echo "🌐 Acesse sua aplicação em: http://localhost:8000"
-echo "🗄️ PhpMyAdmin disponível em: http://localhost:8080"
-echo "📊 Redis disponível em: localhost:6379"
+echo "✅ Setup finalizado! Serviços disponíveis:"
+echo "- App:        http://localhost:8000"
+echo "- PhpMyAdmin: http://localhost:8080"
+echo "- Mailpit:    http://localhost:8025"
 echo ""
-echo "📋 Comandos úteis:"
-echo "  - Parar containers: docker compose down"
-echo "  - Ver logs: docker compose logs -f"
-echo "  - Executar comandos artisan: docker compose exec app php artisan [comando]"
-echo "  - Acessar container: docker compose exec app bash"
-
+echo "👤 Usuário administrador padrão:"
+echo "- Email: admin@onflytest.com"
+echo "- Senha: admin123"
+echo ""
